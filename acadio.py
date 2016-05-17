@@ -3,6 +3,7 @@
 
 import requests #http://requests.readthedocs.org/en/latest/
 import datetime
+import json
 
 from Credentials import Credentials
 
@@ -16,6 +17,8 @@ _token = {'token': None, 'expires': None}
 class Unauthorized(ValueError):
     pass
 class NotFound(ValueError):
+    pass
+class ServerError(ValueError):
     pass
 
 def getToken():
@@ -43,36 +46,95 @@ def getToken():
     
 def _authorizedGet(url):
     return requests.get(url, headers = {'Authorization': getToken()})
+def _authorizedPost(url, payload):
+    headers = {
+        'Authorization': getToken(),
+    # POST as application/x-www-form-urlencoded doesn't seem to be working
+        'Content-Type': 'application/json'
+    }
+    return requests.post(url, data = json.dumps(payload), headers = headers)
 
-def printReport(args):
-    """Download and print the AutoCAD.IO report for a given workitem"""
+def getWorkItem(workItemId):
+    """Get WorkItem"""
     token = getToken()
     resp = _authorizedGet("{0}/WorkItems('{1}')".format(
-        _apiEntryPoint, args.workItem)
+        _apiEntryPoint, workItemId)
     )
     if resp.status_code == 404:
-        raise NotFound(u"WorkItem '{0}' does not exist".format(args.workItem))
+        raise NotFound(u"WorkItem '{0}' does not exist".format(workItemId))
     resp = resp.json()
-    resp = requests.get(resp['StatusDetails']['Report']);
-    print(resp.text)
-    
-def submitWorkItem():
-    pass
+    return resp
 
-#TODO: add support for other operations (submit workitem, query activities etc.)
+def printReport(workItemId):
+    """Download and print the AutoCAD.IO report for a given workitem"""
+    resp = getWorkItem(workItemId)
+    url = resp['StatusDetails']['Report']
+    if url is None:
+        print("WorkItem('{0}') is: {1}".format(workItemId, resp['Status']))
+    else:
+        resp = requests.get(url)
+        print(resp.text)
+
+def submitWorkItem(ActivityId = "PlotToPDF",
+        InputArguments = None,
+        OutputArguments = None):
+    """"Create a WorkItem based on given arguments.
+    Returns the Id of the newly created WorkItem.
+    Defaults create the WorkItem described in the API docs:
+    https://developer.autodesk.com/api/autocadio/#to-create-a-workitem"""
+    if InputArguments is None:
+        InputArguments = [{
+            "Resource":"https://s3.amazonaws.com/AutoCAD-Core-Engine-Services/TestDwg/makeall.dwg",
+            "Name":"HostDwg","StorageProvider":"Generic"
+        }]
+    if OutputArguments is None:
+        OutputArguments = [{
+            "Name":"Result","StorageProvider":"Generic","HttpVerb":"POST"
+        }]
+    req = {
+      "@odata.type":"#ACES.Models.WorkItem","Arguments":{
+           "InputArguments": InputArguments,
+           "OutputArguments": OutputArguments,
+       },"ActivityId": ActivityId, "Id":""
+    }
+    resp = _authorizedPost('{0}WorkItems'.format(_apiEntryPoint), req)
+    if resp.status_code == 401:
+        raise Unauthorized('Unauthorized to create a WorkItem')
+    if resp.status_code == 500:
+        print resp.json()
+        print resp.json()['error']['innererror']['stacktrace']
+        raise ServerError('Remote server error')
+    resp = resp.json()
+    return resp['Id']
+
+#TODO: add support for other operations (query activities etc.)
 if __name__ == '__main__':
-    import argparse
+    import argparse, time
     parser = argparse.ArgumentParser(description='Get error report from AutoCAD.IO for a work item.')
-    parser.add_argument('--consumerKey', required=True);
-    parser.add_argument('--consumerSecret', required=True);
-    parser.add_argument('--workItem', required=True);
+    parser.add_argument('--clientId', required=True);
+    parser.add_argument('--clientSecret', required=True);
     
     args = parser.parse_args()
     
     ApiCredentials = Credentials(
-        clientId = args.consumerKey,
-        clientSecret = args.consumerSecret
+        clientId = args.clientId,
+        clientSecret = args.clientSecret
     )
     
-    #For now, the only supported operation is printing the report of a workitem.
-    printReport(args)
+    # Create a default WorkItem
+    workItemId = submitWorkItem()
+    print("Created WorkItem('{0}')".format(workItemId))
+    # Wait until WorkItem is done
+    while True:
+        workItem = getWorkItem(workItemId)
+        if workItem['Status'] not in ['Pending', 'InProgress']:
+            break
+        else:
+            print("WorkItem is {0}".format(workItem['Status']))
+        time.sleep(2)
+    # Print the report of that WorkItem
+    printReport(workItemId)
+    workItem = getWorkItem(workItemId)
+    print('OutputArguments')
+    print(workItem['Arguments']['OutputArguments'])
+    
