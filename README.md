@@ -15,6 +15,7 @@ This is a Python sample code for AutoCAD.IO (v2). It is a very short demo at thi
 * download [Python](https://www.python.org/downloads/). The code can work with old version such as 2.7, but it is recommended to use the new version.
 * run acadio.py with the  credentials and workitem id like:
 * * acadio.py --consumerKey [you key] --consumerSecret [your secret] --workItem  [your work item id]
+* [![](help/testdemo.png)]
 
  
  ## License
