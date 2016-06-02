@@ -14,7 +14,7 @@ This is a Python sample code for AutoCAD.IO (v2). It is a very short demo at thi
 * Follow the steps on https://developer.autodesk.com/api/autocadio/#sample-codes to create a test codes with full workflow: create activity, create workitem, create app package (if needed) . make a note with the workitem id
 * download [Python](https://www.python.org/downloads/). The code can work with old version such as 2.7, but it is recommended to use the new version.
 * run acadio.py with the  credentials and workitem id like:
-* * acadio.py --consumerKey <you key> --consumerSecret <your secret> --workItem  <your work item id>
+* * acadio.py --consumerKey [you key] --consumerSecret [your secret] --workItem  [your work item id]
 
  
  ## License
