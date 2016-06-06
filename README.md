@@ -6,7 +6,7 @@
 ![Platforms](https://img.shields.io/badge/platform-windows%20%7C%20osx%20%7C%20linux-lightgray.svg)
  [![License](http://img.shields.io/:license-mit-red.svg)](http://opensource.org/licenses/MIT)
  
- ## Description
+## Description
 This is a Python sample code for AutoCAD.IO (v2). It is a very short demo at this moment which shows get token and check the status of one existing workitem only. More functions of IO will be added in the future.
  
 ##Setup/Usage Instructions
