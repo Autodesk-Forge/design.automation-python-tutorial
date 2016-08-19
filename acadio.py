@@ -20,6 +20,8 @@ class NotFound(ValueError):
     pass
 class ServerError(ValueError):
     pass
+class QuotaExceeded(RuntimeError):
+    pass
 
 def getToken():
     """Obtain Apiggee token given a consumer key/secret 
@@ -104,7 +106,12 @@ def submitWorkItem(ActivityId = "PlotToPDF",
         print resp.json()
         print resp.json()['error']['innererror']['stacktrace']
         raise ServerError('Remote server error')
-    resp = resp.json()
+    if resp.status_code == 429:
+        raise QuotaExceeded('Quota Exceeded', resp.text)
+    try:
+        resp = resp.json()
+    except:
+        print(resp.text)
     return resp['Id']
 
 #TODO: add support for other operations (query activities etc.)
