@@ -1,9 +1,9 @@
-﻿import requests #http://requests.readthedocs.org/en/latest/
+import requests #http://requests.readthedocs.org/en/latest/
 import argparse
 
 def getToken(consumerKey, consumerSecret):
     """Obtain Apiggee token given a consumer key/secret"""
-    req = { 'client_id' : consumerKey, 'client_secret': consumerSecret, 'grant_type' : 'client_credentials'}
+    req = { 'client_id' : consumerKey, 'client_secret': consumerSecret, 'grant_type' : 'client_credentials','scope':'code:all'}
     resp = requests.post('https://developer.api.autodesk.com/authentication/v1/authenticate', req).json();
     return resp['token_type'] + " " + resp['access_token']
 
