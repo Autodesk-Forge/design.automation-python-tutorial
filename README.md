@@ -15,7 +15,7 @@ This is a Python sample code for <b>Design Automation API</b> (v2). It is a very
 * Download [Python](https://www.python.org/downloads/). The code can work with old version such as 2.7, but it is recommended to use the new version.
 * run acadio.py with the  credentials and workitem id like:
 * * acadio.py --consumerKey [you key] --consumerSecret [your secret] --workItem  [your work item id]
-* ![thumbnail](/help/testdemo.png)
+![thumbnail](/help/testdemo.png)
 
  
  ## License
