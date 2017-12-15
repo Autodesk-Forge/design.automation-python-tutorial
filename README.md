@@ -2,7 +2,7 @@
 (Formely AutoCAD I/O).
 
 [![ver](https://img.shields.io/badge/language-python-orange.svg)](https://www.python.org/)
- [![ver](https://img.shields.io/badge/Design%20Automation%20API-2.0-blue.svg)](https://developer.autodesk.com/api/autocadio/v2/)
+[![Design Automation](https://img.shields.io/badge/Design%20Automation-v2-green.svg)](http://developer.autodesk.com/)
 ![Platforms](https://img.shields.io/badge/platform-windows%20%7C%20osx%20%7C%20linux-lightgray.svg)
  [![License](http://img.shields.io/:license-mit-red.svg)](http://opensource.org/licenses/MIT)
  
