@@ -76,11 +76,8 @@ pip install requests[security]
 * [Design Automation API help](https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/overview/)
 * [Blogs on Python & Forge](https://forge.autodesk.com/categories/python)
 
-### Limitation
-* as of writing, only AutoCAD Design Automation is released. While the skeleton of this sample could apply with other products (such as Revit, Inventor) after replacing the endpoints.
-
- ## License
- These samples are licensed under the terms of the [MIT License](http://opensource.org/licenses/MIT). Please see the [LICENSE](LICENSE) file for full details.
+## License
+These samples are licensed under the terms of the [MIT License](http://opensource.org/licenses/MIT). Please see the [LICENSE](LICENSE) file for full details.
 
 ### Authors
 
