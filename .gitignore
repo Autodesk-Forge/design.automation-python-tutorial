@@ -55,3 +55,7 @@ docs/_build/
 
 # PyBuilder
 target/
+plugins/UpdateDWGParam/.DS_Store
+output/.DS_Store
+plugins/.DS_Store
+.DS_Store
