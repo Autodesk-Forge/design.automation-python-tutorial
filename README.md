@@ -52,6 +52,8 @@ This is a Python sample code for <b>Design Automation API (DA)</b> (v3). It demo
 
 6. Wait for the response about work item status. If it success, the output model file (model with the updated parameters) will be downloaded to [output folder](/output). Try with other tool (such as https://viewer.autodesk.com ) to verify if the model is valid and parameters are updated. If it fails, the log file will be downloaded to [report folder](/report). 
 
+[![Forge Design Automation Python Workflow](/demo.png)](https://www.youtube.com/embed/YvzBaArFbfQ")
+
 <iframe width="600" height="400" src="https://www.youtube.com/embed/YvzBaArFbfQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Troubleshooting

@@ -21,7 +21,7 @@ import os
 import requests  
 import argparse
 
-print(requests.get('https://www.howsmyssl.com/a/check', verify=False).json()['tls_version'])
+#print(requests.get('https://www.howsmyssl.com/a/check', verify=False).json()['tls_version'])
 
 forge_da = __import__('forge_da')
 config = __import__('config')
