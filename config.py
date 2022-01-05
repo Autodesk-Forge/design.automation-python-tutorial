@@ -13,3 +13,12 @@ Forge_CLIENT_SECRET =''
 desired_nickname = 'xiaodonglikename'   
 #Alias
 alias = 'dev'
+
+#Optional for other use scenarios test
+Personal_AWS_Key = ''
+Personal_AWS_Secret = ''
+Personal_AWS_Token = ''
+Personal_AWS_Bucket_Key = ''
+Personal_AWS_Region = ''
+x_amz_algorithm = 'AWS4-HMAC-SHA256'
+ 

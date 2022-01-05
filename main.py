@@ -20,11 +20,24 @@ import time
 import os
 import requests  
 import argparse
+from pathlib import Path
+import boto3
 
 #print(requests.get('https://www.howsmyssl.com/a/check', verify=False).json()['tls_version'])
 
 forge_da = __import__('forge_da')
-config = __import__('config')
+config = __import__('config') 
+utility = __import__('utility') 
+
+#forge_da.createWorkItem_outputPersonalAWSBucket('2',{'bucketKey':'bucket_key','inputFileNameOSS':'file_name.rvt','jsonInput':{}} )
+#create folders for report and output
+script_path = os.getcwd()
+new_abs_path = os.path.join(script_path, 'report')
+if Path(new_abs_path).is_dir()==False: 
+    os.mkdir(new_abs_path)
+new_abs_path = os.path.join(script_path, 'output')
+if Path(new_abs_path).is_dir()==False: 
+    os.mkdir(new_abs_path)
 
 appPackagePath = './plugins/bundles/'
 modelfilePath = './sample files/' 
@@ -213,7 +226,7 @@ param['inputFileNameOSS'] = inputFileNameOSS
 param['jsonInput'] ={}
 param['jsonInput']['width'] = width
 param['jsonInput']['height'] = height
-res = forge_da.createWorkItem(qualifiedActivityId,param)
+res = forge_da.createWorkItem(qualifiedActivityId,param) 
 if res == None:
      quit()
 #work item ID
@@ -239,33 +252,57 @@ while status == 'pending' or status == 'inprogress':
         print('     get work item status timeout!') 
         break
 
-print('****work item status:' + status)
-
+print('****work item status <outour to Forge OSS bucket>:' + status)
 
 ### 9. get output file or log file 
-
+reportUrl = statusRes['reportUrl']  
 if status == 'success':
-    # #successful job. download the output file from Forge OSS bucket
-    print('---downloading output file:'+ outputFileNameOSS ) 
-
-    res = requests.get(ossOutputUrl,headers={'Authorization': config.token})  
-    if res.status_code == 200:  
-        with open('./output/' + outputFileNameOSS , 'wb') as f:
-            f.write(res.content)
-            print('get output file succeeded: '+ './output/' + outputFileNameOSS) 
-    else:
-        print('get output file failed!')
-   
+    # #successful job. download report and the output file from Forge OSS bucket
+    utility.downloadResults({'workItemId':workItemId,'report':{'url':reportUrl},
+    'output':{'url':ossOutputUrl,'header':{'Authorization': config.token},'fileName':outputFileNameOSS}})
 else:
-    print('---downloading report file:'+ workItemId +'.log' )  
     #failed job. download the report file
-    reportUrl = statusRes['reportUrl'] 
-    res = requests.get(reportUrl)  
-    if res.status_code == 200: 
-        with open('./report/' +workItemId +'.log' , 'wb') as f:
-            f.write(res.content)
-            print('get log file succeeded: '+ './output/' +workItemId +'.log') 
-    else:
-        print('get log file failed!')
+    utility.downloadResults({'workItemId':workItemId,'report':{'url':reportUrl},'output':None}) 
+    
 
+# #other user scenarios ###
+## output to personal AWS bucket
+print('---Create workItem, output to personal AWS bucket...')  
+inputparam={}
+inputparam['bucketKey'] = bucketKey
+inputparam['inputFileNameOSS'] = inputFileNameOSS
+inputparam['jsonInput'] ={}
+inputparam['jsonInput']['width'] = width
+inputparam['jsonInput']['height'] = height  
+res =  forge_da.createWorkItem_outputPersonalAWSBucket(qualifiedActivityId,inputparam)
+
+if res == None:
+     quit()
+#work item ID
+workItemId = res['id']  
+
+# ###check workitem status and download result/report
+status = 'pending'
+print('---work item running!')
+start_time = time.time()
+while status == 'pending' or status == 'inprogress':
+    statusRes = forge_da.getWorkItemStatus(workItemId)
+    if statusRes == None:
+        quit()
+    status = statusRes['status']
+    if status != 'pending' and status != 'inprogress':
+        break
+    elapsed_time = time.time() - start_time
+    if elapsed_time > TIMEOUT:
+        print('     get work item status timeout!') 
+        break
+
+print('****work item status <output to personal AWS bucket>:' + status) 
+
+# ### get log file only as the output has been uploaded to AWS bucket
+# try with AWS SDK to download it needed.  
+reportUrl = statusRes['reportUrl'] 
+utility.downloadResults({'workItemId':workItemId,'report':{'url':reportUrl},'output':None})  
+
+## 
 
