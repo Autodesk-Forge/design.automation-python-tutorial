@@ -47,7 +47,7 @@ desired_nickname = config.desired_nickname
 #Alias
 alias = config.alias
 
-# time out max 2when get workitem status
+# time out max 
 TIMEOUT = 10 * 60  # 10min
 
 #default width
@@ -63,6 +63,7 @@ parser.add_argument('--width', required=True)
 args = parser.parse_args()
 width = args.width
 height = args.height
+
 
 ### 0. get bundle
 file_list=os.listdir(appPackagePath)
@@ -102,15 +103,35 @@ if token == None:
 print('---Check nick name...')
 
 nickname = forge_da.getNickName()
-print('nick name: ' + nickname) 
+print('current nick name: ' + nickname) 
 if nickname == None:
     quit()   
-if nickname == config.Forge_CLIENT_ID :
+
+print('Would you like to delete existing nickname and reset with <' + nickname +'>?' 
+'WARNING! deleting current nick name will delete ALL your personal activities and appbundles!!')  
+variable = input('Y/N: ')
+
+if variable == 'Y' or variable == 'y':
+    print('delete nick name: ' + nickname)  
     #set desired nick name
     if forge_da.deleteNickName(nickname) == None:
         quit()
-    if forge_da.setNickName(desired_nickname) == None:
-        quit()
+    #since deleting might take time, wait until it is done
+    print('since deleting might take a little time,  set nickname can only work when deleting has done. ')   
+    res = forge_da.setNickName(desired_nickname)
+    start_time = time.time()
+    last_ticktime = start_time
+    while res == None:
+        print('trying to set again..')
+        #call one more time after 5 seconds, instead of frequent calling
+        if time.time() - last_ticktime > 5:
+            last_ticktime = time.time()
+            res = forge_da.setNickName(desired_nickname)
+        #total time of the looping
+        elapsed_time = time.time() - start_time
+        if elapsed_time > TIMEOUT:
+            print('TIMEOUT to set nickname!')
+            quit()
 
 nickname = forge_da.getNickName()
 if nickname == None:
